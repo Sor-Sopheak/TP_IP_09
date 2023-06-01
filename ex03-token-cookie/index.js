@@ -2,34 +2,34 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 var app = express();
-const User = require('../ex02-auth-db/models/users');
+const session = require('express-session');
 
-app.use(cors({
-    origin: 'http://127.0.0.1:3000'
-}));
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
+
+
+app.use(session({
+  secret: 'my-secret',
+  resave: true,
+  rolling: true,
+  saveUninitialized: true,
+  name: 'token',
+  cookie: {
+    message: 1000*60*60*2, //2hours
+    sameSite: true,
+    secure: false
+  }
+}))
+
+app.use(express.json());
+app.get('/', (req, res) => {
+  res.send('<h1>Hello Sor Sopheak</h1>')
+})
 
 // Connect to MongoDB
 require('./db/db')()
   .then(() => {
-    app.use(require('./routes'));
-  
-    // Login Route
-    app.post('/login', async (req, res) => {
-      const { email, password } = req.body;
-    
-      try {
-        const user = await User.login(email, password);
-        if(user){
-          res.status(200).json({message: 'Login successful'});
-        } else {
-          res.status(401).json({ message: 'Invalid email or password' });
-        }
-      } catch (error) {
-        res.status(500).json({ message: 'An error occurred' });
-      }
-    });
+    app.use(require('./routes/index'));
 
     // Start the server
     app.listen(process.env.PORT || 3001, () => {

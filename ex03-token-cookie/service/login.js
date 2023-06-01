@@ -1,15 +1,11 @@
 const users = require('../models/users');
 const bcrypt = require('bcrypt');
 
- //Decrpt password
-async function comparePasswords(plaintextPassword, hash) {
-    return await bcrypt.compare(plaintextPassword, hash);
-}
-  
 const login = async(email, password) =>{
+    console.log(("n fnghfhf"));
     try {
         var existed = await users.findOne({email})
-        var isPasswordCorrect = await comparePasswords(password, existed.password);
+        var isPasswordCorrect = bcrypt.compareSync(password, existed.password);
 
         if(!existed){
             throw "Email is incorrected."

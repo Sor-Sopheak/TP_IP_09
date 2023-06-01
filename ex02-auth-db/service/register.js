@@ -16,7 +16,6 @@ const register = async(params) => {
         throw "username is already used"
     }
 
-
     //Encrypt Password
     var salt = bcrypt.genSaltSync(10);
     var hash = bcrypt.hashSync(password, salt);
